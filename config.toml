@@ -1,0 +1,54 @@
+baseURL = 'https://ankilp.github.io'
+languageCode = 'en-us'
+title = 'Ankil Patel'
+theme = "papermod"
+
+paginate=5
+enableInlineShortcodes = true
+enableRobotsTXT = true
+
+[minify]
+disableXML = true
+
+[languages.en]
+languageName = "English"
+weight = 1
+
+[params]
+env = "production"
+author = "Ankil"
+defaultTheme = "auto"
+ShowShareButtons = false
+ShowReadingTime = true
+displayFullLangName = true
+ShowPostNavLinks = true
+ShowBreadCrumbs = true
+ShowCodeCopyButtons = true
+ShowToc = true
+Comments = true
+
+  [params.homeInfoParams]
+  Title = "Welcome!"
+  Content = """
+Feel free to chat with me regarding any of my previous internships at Electronic Arts, Thales or the University of Waterloo. I'm currently doing an internship at Salesforce.
+"""
+
+[[params.socialIcons]]
+  name = "github"
+  url = "https://github.com/AnkilP"
+
+  [[params.socialIcons]]
+  name = "linkedin"
+  url = "https://linkedin.com/in/ankil-patel"
+
+  [[params.socialIcons]]
+  name = "email"
+  url = "mailto:ankil335@gmail.com"
+
+[taxonomies]
+category = "categories"
+tag = "tags"
+series = "series"
+
+[markup.goldmark.renderer]
+unsafe = true
