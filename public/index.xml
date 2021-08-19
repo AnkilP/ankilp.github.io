@@ -16,5 +16,14 @@
       <description>Description of my team&amp;#39;s solution</description>
     </item>
     
+    <item>
+      <title>Ensnif</title>
+      <link>https://ankilp.github.io/posts/ensnif/</link>
+      <pubDate>Mon, 21 Sep 2020 00:54:53 -0400</pubDate>
+      
+      <guid>https://ankilp.github.io/posts/ensnif/</guid>
+      <description>Privacy-preserving platform to host data</description>
+    </item>
+    
   </channel>
 </rss>
