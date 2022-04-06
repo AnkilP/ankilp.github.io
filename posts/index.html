@@ -18,7 +18,7 @@
 <link rel="mask-icon" href="https://ankilp.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<meta name="generator" content="Hugo 0.92.0" />
+<meta name="generator" content="Hugo 0.96.0" />
 <link rel="alternate" type="application/rss+xml" href="https://ankilp.github.io/posts/index.xml">
 <meta property="og:title" content="Posts" />
 <meta property="og:description" content="" />
@@ -46,14 +46,10 @@
 </script>
 </head>
 
-<body class="list" id="top">
+<body class="list dark" id="top">
 <script>
-    if (localStorage.getItem("pref-theme") === "dark") {
-        document.body.classList.add('dark');
-    } else if (localStorage.getItem("pref-theme") === "light") {
+    if (localStorage.getItem("pref-theme") === "light") {
         document.body.classList.remove('dark')
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.body.classList.add('dark');
     }
 
 </script>
@@ -62,34 +58,6 @@
         #theme-toggle,
         .top-link {
             display: none;
-        }
-
-    </style>
-    <style>
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --theme: #1d1e20;
-                --entry: #2e2e33;
-                --primary: rgba(255, 255, 255, 0.84);
-                --secondary: rgba(255, 255, 255, 0.56);
-                --tertiary: rgba(255, 255, 255, 0.16);
-                --content: rgba(255, 255, 255, 0.74);
-                --hljs-bg: #2e2e33;
-                --code-bg: #37383e;
-                --border: #333;
-            }
-
-            .list {
-                background: var(--theme);
-            }
-
-            .list:not(.dark)::-webkit-scrollbar-track {
-                background: 0 0;
-            }
-
-            .list:not(.dark)::-webkit-scrollbar-thumb {
-                border-color: var(--theme);
-            }
         }
 
     </style>
@@ -136,8 +104,7 @@
     <h2>Why I Don&#39;t Use Smart Watches (for now)</h2>
   </header>
   <section class="entry-content">
-    <p>A few friends and I took part in the MakeUofT hackathon (a couple years ago) - we built a tool that could assess whether plants in a greenhouse were healthy using a camera and some computer vision tricks (mostly looking at how the water flowed through the veins of the leaves). We won the Telus Prize for our work and each of us got an Apple Watch.
-I had been reading about wearables and their potential to detect biomarkers....</p>
+    <p>Videos like Can you really tell if a kid is lying and posts like Smartwatch can detect early signs of illness impressed upon me a game-changing potential for wearables to make diagnoses more accurate and prognoses more reliable. When I won an Apple Watch at a hackathon, I was very excited to try it out. I understood that the medical tech that I’d wanted to see wouldn’t become mainstream until the data collected by the watch was accepted by the medical community....</p>
   </section>
   <footer class="entry-footer">January 15, 2022&nbsp;·&nbsp;6 min&nbsp;·&nbsp;Ankil</footer>
   <a class="entry-link" aria-label="post link to Why I Don&#39;t Use Smart Watches (for now)" href="https://ankilp.github.io/posts/smart-watches/"></a>

@@ -17,14 +17,14 @@ weight = 1
 [params]
 env = "production"
 author = "Ankil"
-defaultTheme = "auto"
-ShowShareButtons = false
+defaultTheme = "dark"
+ShowShareButtons = true
 ShowReadingTime = true
 displayFullLangName = true
 ShowPostNavLinks = true
 ShowBreadCrumbs = true
 ShowCodeCopyButtons = true
-ShowToc = true
+ShowToc = false
 Comments = true
 
   [params.homeInfoParams]
