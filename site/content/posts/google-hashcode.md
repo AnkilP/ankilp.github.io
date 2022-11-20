@@ -10,6 +10,8 @@ math: true
 toc: false
 ---
 
+Update: We participated this year (2022) as well (Top 3% globally - Team name: 6 am vibes). I've started to realize that these problems are very similar... they're some combination of assignment + scheduling problems. And the solutions generally follow the simulated annealing approach.  I hope to compete next year and I'll certainly aim higher to test whether breaking into upper echelons requires a completely different mode of thinking. 
+
 ## Introduction
 
 I competed in the online qualification round for Google Hashcode this week (2021) (Team: Not Last Place). We didn't do as terribly as we did last year - we placed 29th in Canada and in the top 30% globally. I wanted to share our solution in this doc and later go over areas of improvement. I welcome any and all comments and questions - send me an email <ankil335@gmail.com>.

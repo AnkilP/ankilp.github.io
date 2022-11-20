@@ -3,7 +3,7 @@ languageCode = 'en-us'
 title = 'Ankil Patel'
 theme = "papermod"
 
-paginate=5
+paginate=15
 enableInlineShortcodes = true
 enableRobotsTXT = true
 
@@ -28,9 +28,9 @@ ShowToc = false
 Comments = true
 
   [params.homeInfoParams]
-  Title = "Welcome!"
+  Title = "Welcome to my personal blog!"
   Content = """
-Feel free to chat with me regarding any of my previous internships at Electronic Arts, Thales or the University of Waterloo. I'm currently doing an internship at Salesforce.
+Please note that all opinions are my own. I'm currently a software engineer at Salesforce. Feel free to chat with me regarding any of my previous work at Salesforce, Electronic Arts, Thales or the University of Waterloo.
 """
 
 [[params.socialIcons]]
