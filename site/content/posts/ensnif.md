@@ -42,14 +42,6 @@ Organizations can also opt to share their data within a consortium of other orga
 In any case, once the user decides to pick a dataset, we take the user to an airflow page where they can submit their git repo to run the code within the repo. 
 Airflow is used to manage the workflows - we picked Airflow because of its rich user interface and reasonable friendly Kubernetes operator. Airflow is used to start a Spark job which will run and give the user their results. A similar workflow exists for a group of organizations in that all of the organizations see a separate airflow dashboard and they can submit their own programs. The results are sent back to the users who can decrypt the results to see it in plaintext.
 
-## Differential Privacy
-
-Coming soon
-
-## Link
-
-[https://ensnif.com]
-
 
 
 

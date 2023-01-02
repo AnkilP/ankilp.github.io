@@ -16,3 +16,5 @@ I've largely felt microloans as a concept have only recently gained serious atte
 
 [TODO - talk about future of microloans, what's needed to get NA there (legislation, partners, etc.)]
 
+I think advertising itself can be reframed more abstractly - what is advertising? Why limit it to microloans?
+

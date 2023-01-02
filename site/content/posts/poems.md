@@ -13,20 +13,20 @@ To commemorate well-deserved progress gleefully.
 Imagine my disappointment to see some naysayers
 Amongst the politically vocal taxpayers.
 
-Too eager to miss the forest for the trees!
-Too eager to burn the tree for the forest!
-Too eager to make podiums from twigs!
+Too eager to miss the forest for the trees
+Too eager to burn the tree for the forest
+Too eager to make podiums from twigs
 
-We are to aspire to excellence
+We are to aspire to the creator
 Not the common denominator.
 
-Tide and time are more patient than me.
+And yet time and tide are more patient than I.
 ~~~
 I initially wrote this after International Women's Day but later realized that it unfortunately applied to a lot of different scenarios.
 ~~~
 (Jazz is) Controlled Chaos
 
-Drowners' lungs can't compare
+Swimmers' lungs can't compare
 To the turbulence stored inside
 The madness within exhaled into lullabies
 
@@ -34,7 +34,7 @@ O' demon within, exorcised into articulation,
 Sell me my soul back to
 Harmonize this brash instrument to beating organ
 ~~~
-I love jazz and I absolutely love playing the alto sax. The way I connect to the music with a piano is through the sound and my hands but with wind instruments, it also involved my breath, the giver of life, to make music. That connection has always been very special for me.
+I love jazz and playing the alto sax. I especially love the way I connect to the music with the saxophone: it involves my breath, the giver of life, to make music.
 ~~~
 Work
 
@@ -52,7 +52,7 @@ Depend on it
 The theocracy of work has but one currency:
 A token of my gratitude
 ~~~
-I might have written this in frustration. 
+While I love the work I do, I sometimes feel like too much of my life revolves around it. 
 ~~~
 Laws are like fences
 
@@ -81,7 +81,7 @@ The rules of paradise can never nice
 Fences keep the honest people honest
 Just don’t take away the fence promised
 ~~~
-I've always been a bit cynical about the law and its usefulness and I hope this poem conveys some of that frustration.
+This "villanelle" is verbose because of the rhyming and meter constraints. However, this version is still not strictly a villanelle because it doesn't comply with it completely.
 ~~~
 Northern Lights
 
@@ -104,4 +104,34 @@ Of stars
 And 
 Old Wisdoms
 ~~~
-Boy scouts have been such a formative experience for me that I couldn't pass on an opportunity to write a poem about seeing the northern lights on a camping trip. 
+My time in Scouts has been such a formative experience for me that I couldn't pass on an opportunity to write a poem about seeing the northern lights on a camping trip. 
+
+~~~
+Bharatanatyam
+
+Let me tell you a story
+About a dancer supreme,
+A craven king,
+And his foolish dream
+
+She spun around 
+With emerald eyes
+And stole his heart
+But left his fears
+ 
+When she spun away
+With blinding speed,
+It broke his heart
+But left him wise
+
+Avoid the eyes, I should've said
+The fearful get trapped there!
+~~~
+
+There's an old Indian ballad about a king who falls for a dancer and loses his kingdom in the pursuit of her affection. At the end of the song, the songstress blames the dancer for seducing the king and brands her a witch. This might remind you of [medieval witch hunts](https://www.youtube.com/watch?v=X2xlQaimsGg). This poem twists that ballad by framing the king as craven.
+Bharatanatyam is a dance style with distinctive eye movements. The eye movements are meant to be subtle in some cases and powerful in others to indicate emotion. 
+
+------------------------------------------------------------------------
+
+**[Cover of Sweetest Music This Side of Heaven by Guy Lombardo](https://soundcloud.com/ankil-p/whistling-cover-to-the-opening-to-the-sweetest-side-of-heaven)**
+
