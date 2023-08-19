@@ -45,6 +45,10 @@ Please note that all opinions are my own. I'm currently a software engineer at S
   name = "email"
   url = "mailto:ankil335@gmail.com"
 
+[[params.socialIcons]]
+name = "instagram"
+url = "https://instagram.com/randommoleculez"
+
 [taxonomies]
 category = "categories"
 tag = "tags"
