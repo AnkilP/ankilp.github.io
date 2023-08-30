@@ -30,7 +30,9 @@ Comments = true
   [params.homeInfoParams]
   Title = "Welcome to my personal blog!"
   Content = """
-Please note that all opinions are my own. I'm currently a software engineer at Salesforce. Feel free to chat with me regarding any of my previous work at Salesforce, Electronic Arts, Thales or the University of Waterloo.
+Please note that all opinions are my own. I'm currently a software engineer at Salesforce. Feel free to chat with me regarding any of my previous work at Salesforce, Electronic Arts, Thales or the University of Waterloo. 
+
+I love travelling and reading. I've found a way to combine the two by picking up a book written by a local author in every new city I visit. 
 """
 
 [[params.socialIcons]]
