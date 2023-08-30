@@ -34,7 +34,7 @@ O' demon within, exorcised into articulation,
 Sell me my soul back to
 Harmonize this brash instrument to beating organ
 ~~~
-I love jazz and playing the alto sax. I especially love the way I connect to the music with the saxophone. In the timeless words of **[Ted Chiang](https://electricliterature.com/the-great-silence-by-ted-chiang/)**: "when we speak, we use the breath in our lungs to give our thoughts a physical form. The sounds we make are simultaneously our intentions and our life force." 
+I love jazz and playing the alto sax. I especially love the way I connect to the music with the saxophone. In the timeless words of **[Ted Chiang](https://electricliterature.com/the-great-silence-by-ted-chiang/)**: "when we speak, we use the breath in our lungs to give our thoughts a physical form. The sounds we make are simultaneously our intentions and our life force." 
 ~~~
 Work
 
@@ -77,7 +77,7 @@ But articulate clearly the ethos to aspire
 Just don’t take away the fence promised
 
 The best laid plans of mice and men are never blest
-The rules of paradise can never nice
+The rules of paradise are never nice
 Fences keep the honest people honest
 Just don’t take away the fence promised
 ~~~
