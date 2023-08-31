@@ -1,3 +1,0 @@
-User-agent: *
-Disallow:
-Sitemap: https://ankilp.github.io/sitemap.xml
