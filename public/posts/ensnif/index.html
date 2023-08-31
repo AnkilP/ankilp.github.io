@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html><head lang="en">
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Ensnif - Ankil Patel</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Privacy-preserving platform to host data" />
+	<meta property="og:image" content=""/>
+	<meta property="og:title" content="Ensnif" />
+<meta property="og:description" content="Privacy-preserving platform to host data" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ankilp.github.io/posts/ensnif/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2020-09-21T00:54:53-04:00" />
+<meta property="article:modified_time" content="2020-09-21T00:54:53-04:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Ensnif"/>
+<meta name="twitter:description" content="Privacy-preserving platform to host data"/>
+<script src="https://ankilp.github.iojs/feather.min.js"></script>
+	
+	
+        <link href="https://ankilp.github.io/css/fonts.2c2227b81b1970a03e760aa2e6121cd01f87c88586803cbb282aa224720a765f.css" rel="stylesheet">
+	
+
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="https://ankilp.github.io/css/main.ac08a4c9714baa859217f92f051deb58df2938ec352b506df655005dcaf98cc0.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ankilp.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css" media="(prefers-color-scheme: dark)"  />
+	
+
+	
+	
+		<script type="text/javascript"
+		src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+		</script>
+	
+		
+		<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			tex2jax: {
+				inlineMath: [['$','$'], ['\\(','\\)']],
+				displayMath: [['$$','$$'], ['\[','\]']],
+				processEscapes: true,
+				processEnvironments: true,
+				skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+				TeX: { equationNumbers: { autoNumber: "AMS" },
+						 extensions: ["AMSmath.js", "AMSsymbols.js"] }
+			}
+		});
+		</script>
+	
+
+	
+	
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css">
+		<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js"></script>
+		<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+		
+		
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+					renderMathInElement(document.body, {
+							delimiters: [
+									{left: "$$", right: "$$", display: true},
+									{left: "$", right: "$", display: false}
+							]
+					});
+			});
+			</script>
+	
+	
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://ankilp.github.io">Ankil Patel</a>
+	</div>
+	<nav>
+		
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Ensnif</h1>
+			<div class="meta">Posted on Sep 21, 2020</div>
+		</div>
+		
+
+		<section class="body">
+			<h2 id="update">Update</h2>
+<p>This project is no longer active.</p>
+<h2 id="motivation">Motivation</h2>
+<p>As Andrew Trask from OpenMined puts it (and I&rsquo;m paraphrasing here): there are cases where public information is found in private information. The canonical example given by Trask is of building a cancer detection model using patient data: the model itself is not representative of any specific person but the individual data point used to build the model is unique. This private information is collected under the explicit trust (sometimes implicit) that the information won&rsquo;t be divulged (through any means). The conventional methods to keep this promise involved anonymizing data. However, the industry has denounced the practice since there were multiple cases where participants' private information was divulged despite the dataset being anonymized.</p>
+<p>It stands that much good can come from using private information but it must be done judiciously; with a platform that preserves this privacy and also allows groups to collaborate, we expect more data being shared to build smarter and more robust models without giving up access to the data.</p>
+<h2 id="introduction">Introduction</h2>
+<p>We&rsquo;re building a platform where public and private institutions can host their data and make it available to the general public without giving access to the underlying information.</p>
+<h2 id="where-do-existing-solutions-fit-in">Where do existing solutions fit in?</h2>
+<p>The business models used by the existing companies above offer highly curated services for their customers, which allows them to focus on their customers’ needs with an incredible level of detail.</p>
+<p>However, a large portion of the market is not being served by this business model because either our competitors don’t have the bandwidth or the price is not justifiable.</p>
+<p>We’re more interested in a general purpose data sharing platform - on the level of cities trying to make data available to social programs or small businesses making their sales data available to marketing services.</p>
+<h2 id="high-level-overview">High-level Overview</h2>
+<p>This document is hopefully one of many and I will try to detail as much of this process as I can. For now, I&rsquo;ll talk about the overall flow.</p>
+<p>The data marketplace allows data owners to share data. If an organization wants to serve their data for anyone, they encrypt their data using a fully homomorphic key and send the encrypted data to us. The nature of homomorphic schemes allows us to serve that data to help train another party&rsquo;s models. We also use concepts in differential privacy to ensure privacy as well. Refer to the section on differential privacy where I talk about how we can ensure that the underlying information is kept private. If you&rsquo;re curious, take a look at: [https://arxiv.org/pdf/1812.02292.pdf].
+Organizations can also opt to share their data within a consortium of other organizations - for example, a grocery store can share their order data with the logistics team at a delivery company. We would use SCALE-MAMBA, a MPC library, to facilitate sharing between organizations.</p>
+<p>In any case, once the user decides to pick a dataset, we take the user to an airflow page where they can submit their git repo to run the code within the repo.
+Airflow is used to manage the workflows - we picked Airflow because of its rich user interface and reasonable friendly Kubernetes operator. Airflow is used to start a Spark job which will run and give the user their results. A similar workflow exists for a group of organizations in that all of the organizations see a separate airflow dashboard and they can submit their own programs. The results are sent back to the users who can decrypt the results to see it in plaintext.</p>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			<nav class="nav tags">
+				<ul class="tags">
+					
+					<li><a href="/tags/spark">spark</a></li>
+					
+					<li><a href="/tags/airflow">airflow</a></li>
+					
+					<li><a href="/tags/mpc">mpc</a></li>
+					
+					<li><a href="/tags/fhe">fhe</a></li>
+					
+					<li><a href="/tags/time-series">time-series&#34;</a></li>
+					
+					<li><a href="/tags/go">go</a></li>
+					
+					<li><a href="/tags/scale-mamba">SCALE-MAMBA</a></li>
+					
+					<li><a href="/tags/hudi">hudi</a></li>
+					
+				</ul>
+			</nav>
+			
+			
+		</div>
+		</article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/AnkilP" rel="me" title="GitHub"><i data-feather="github"></i></a>
+    <a class="border"></a><a class="soc" href="https://gitlab.com/athul/" rel="me" title="GitLab"><i data-feather="gitlab"></i></a>
+    <a class="border"></a><a class="soc" href="https://instagram.com/randommoleculez" rel="me" title="Instagram"><i data-feather="instagram"></i></a>
+    <a class="border"></a><a class="soc" href="mailto:ankil335@gmail.com" rel="me" title="Email"><i data-feather="email"></i></a>
+    <a class="border"></a><a class="soc" href="https://linkedin.com/in/ankil-patel" rel="me" title="Email"><i data-feather="linkedin"></i></a>
+    <a class="border"></a></div>
+  <div class="footer-info">
+    2023  © Ankil |  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+  </div>
+</footer>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'G-YXFJCKLYLT', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+<script>
+  feather.replace()
+</script></div>
+    </body>
+</html>

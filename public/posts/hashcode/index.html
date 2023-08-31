@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html><head lang="en">
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Google Hashcode - Ankil Patel</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Description of my team&#39;s solution" />
+	<meta property="og:image" content=""/>
+	<meta property="og:title" content="Google Hashcode" />
+<meta property="og:description" content="Description of my team&#39;s solution" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ankilp.github.io/posts/hashcode/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-03-01T00:14:44-05:00" />
+<meta property="article:modified_time" content="2021-03-01T00:14:44-05:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Google Hashcode"/>
+<meta name="twitter:description" content="Description of my team&#39;s solution"/>
+<script src="https://ankilp.github.iojs/feather.min.js"></script>
+	
+	
+        <link href="https://ankilp.github.io/css/fonts.2c2227b81b1970a03e760aa2e6121cd01f87c88586803cbb282aa224720a765f.css" rel="stylesheet">
+	
+
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="https://ankilp.github.io/css/main.ac08a4c9714baa859217f92f051deb58df2938ec352b506df655005dcaf98cc0.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ankilp.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css" media="(prefers-color-scheme: dark)"  />
+	
+
+	
+	
+		<script type="text/javascript"
+		src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+		</script>
+	
+		
+		<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			tex2jax: {
+				inlineMath: [['$','$'], ['\\(','\\)']],
+				displayMath: [['$$','$$'], ['\[','\]']],
+				processEscapes: true,
+				processEnvironments: true,
+				skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+				TeX: { equationNumbers: { autoNumber: "AMS" },
+						 extensions: ["AMSmath.js", "AMSsymbols.js"] }
+			}
+		});
+		</script>
+	
+
+	
+	
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css">
+		<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js"></script>
+		<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+		
+		
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+					renderMathInElement(document.body, {
+							delimiters: [
+									{left: "$$", right: "$$", display: true},
+									{left: "$", right: "$", display: false}
+							]
+					});
+			});
+			</script>
+	
+	
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://ankilp.github.io">Ankil Patel</a>
+	</div>
+	<nav>
+		
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Google Hashcode</h1>
+			<div class="meta">Posted on Mar 1, 2021</div>
+		</div>
+		
+
+		<section class="body">
+			<p>Update: We participated this year (2022) as well (Top 3% globally - Team name: 6 am vibes). I&rsquo;ve started to realize that these problems are very similar&hellip; they&rsquo;re some combination of assignment + scheduling problems. And the solutions generally follow the simulated annealing approach.  I hope to compete next year and I&rsquo;ll certainly aim higher to test whether breaking into upper echelons requires a completely different mode of thinking.</p>
+<h2 id="introduction">Introduction</h2>
+<p>I competed in the online qualification round for Google Hashcode this week (2021) (Team: Not Last Place). We didn&rsquo;t do as terribly as we did last year - we placed 29th in Canada and in the top 30% globally. I wanted to share our solution in this doc and later go over areas of improvement. I welcome any and all comments and questions - send me an email <a href="mailto:ankil335@gmail.com">ankil335@gmail.com</a>.</p>
+<h2 id="problem">Problem</h2>
+<p>We have a city with intersections and each of these intersections have a street light that control which cars can go through. Each street light has a round-robin schedule - naturally, only one in-degree street can be green at any given time. We repeat the street lights' schedule until the simulation is over. A number of cars want to traverse the city and have pre-defined paths. We want to create a schedule for the street lights such that we minimize the amount of time it takes each car to get to its destination (any car that doesn&rsquo;t reach its destination has a score of 0). All streets are connected by intersections and vice versa. It is my understanding that there are no dead ends. Moreover, only one car can pass through the intersection every second. There is no limit to the number of cars that can be queued at the intersection.</p>
+<h3 id="input">Input</h3>
+<p>The input essentially includes information for each street and each car that drives in the city. Each car has a pre-defined route of streets that the car traverses. A car takes $L_{street_A}$ time units to cross $street_A$. Information for each street includes the intersections that connect the beginning and the end of the street.</p>
+<h3 id="output">Output</h3>
+<p>For each intersection, we expect to see the schedule for each street light. This schedule is repeated until the simulation time is over. The score is determined by the number of cars that reach their destination plus the time difference between when a car reaches its destination and when the simulation ends.</p>
+<h2 id="approach">Approach</h2>
+<p>We needed to grapple with a few questions:</p>
+<ul>
+<li>
+<p>Does optimizing the schedule for each individual street light imply optimizing the schedule for the city as a whole?</p>
+</li>
+<li>
+<p>With the limited time available, is it worth pursuing an optimal solution or is it better to use a heuristic? How good can this heuristic get (and still complete the problem in time)?</p>
+</li>
+</ul>
+<p>For the first question, we initially assumed it was true but when we used more interesting datasets, we realized that this was not an assumption we could always make (if ever). The problem was also similar to problems I had seen in my Intro to Optimization class with the job shop problem - i.e. there are a number of jobs with tasks that need to be done in order and a number of machines that can process these jobs. The difference was that we needed to figure out how long to run each machine (street light) for each job. The objective function remains the same: minimize the makespan. The job shop problem is a NP-hard problem and variations of the job shop problem that are closer to this specific problem are NP-complete or NP-hard [1]. As a result, we decided to use a heuristic.</p>
+<p>For the second question, we thought about what kind of heuristic we&rsquo;d use. Given the nature of the round-robin schedule of the street-lights, we would need to determine how long to keep the green light on for each street. This amount can&rsquo;t be dynamic - once it&rsquo;s set, it has to be used for the entire simulation.</p>
+<p>The baseline we came up with was an average of the cars that visit the intersection on their route. In most cases, the cars won&rsquo;t have to wait. If there&rsquo;s a large burst of cars (e.g. 2x the average), then the second half of the cars will wait considerably longer than the first half since they need to wait for the schedule to repeat.If there are no cars queued, then we&rsquo;re wasting time that could otherwise be given to another street. This simple baseline net us 8 million points.</p>
+<p>There are a few problems already - we calculated the average based on iteration number not time. In other words, if $car_A$ has a route: $X,Y,Z$ and $car_B$ has a route: $Q,W,Z,V,X$ with different $L$&rsquo;s for each unique street, then we would calculate the average for Z as 2/5 since Z appears twice in the third iteration over 5 iterations. If, however, streets $X$ and $Y$ only take 1 time unit to traverse and $Q$ takes 100 time units to traverse, then it&rsquo;s hard to make the case that the green light for $Z$ should be turned on for more than 1 time unit since at any given time, at most one car will have stopped at $Z$. By incorporating $L$ values into our baseline, we roughly got another 1 million points. The only thing left was to predict the wait times.</p>
+<p>Interestingly, by this point, we still weren&rsquo;t getting full points on the example test case. The example test case had two cars, both of which would go to the same intersection, but at different times and from different streets. Our algorithm was designed for maximizing throughput, not minimizing wait times and assigned that street light a schedule of 1 time unit:1 time unit ($street_A$:$street_B$) since that would be the capacity. We didn&rsquo;t account for the initial positions of the cars. In the example test case, the second car (coming from $street_B$) gets to the intersection after 2 time units, but because of the schedule, has to wait 1 time unit before it can be moved through. And by then, it&rsquo;s too late. The ideal schedule would be 2:1. That way, the second car would have a green light as soon as it got to the street light. Unfortunately, at this point, we didn&rsquo;t have enough time to flesh out a general solution to this problem. We discussed several solutions:</p>
+<ul>
+<li>propagate slack times across the intersections</li>
+<li>modify job shop Mixed Integer Linear Programs (MILP) to address this problem</li>
+</ul>
+<p>Moving forward, we should look at the distribution of the dataset. It could give us some information on what kind of heuristics to pursue (e.g. how bursty the cars are) and whether other algorithms could help. In the past, ILP and LP implementations have been too slow for large datasets, but investing time in learning how to use Google&rsquo;s OR-tools could be useful. Genetic algorithms were floated around as a way to determine the optimal schedule for each street light.</p>
+<h2 id="misconceptions">Misconceptions</h2>
+<p>I had seen similar problems in my OS class with single threaded CPU&rsquo;s. The scheduling algorithms used are along the lines of Shortest Remaining Time First, First-Come-First-Serve, etc. However, I can only make those optimality guarantees if I can split up the time given to a street within a single schedule.</p>
+<p>References: <a href="http://people.idsia.ch/~monaldo/papers/EJOR-varJsp-05.pdf">http://people.idsia.ch/~monaldo/papers/EJOR-varJsp-05.pdf</a>.</p>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			<nav class="nav tags">
+				<ul class="tags">
+					
+					<li><a href="/tags/heuristic">heuristic</a></li>
+					
+					<li><a href="/tags/scheduling-algorithms">scheduling algorithms</a></li>
+					
+					<li><a href="/tags/round-robin">round-robin</a></li>
+					
+					<li><a href="/tags/job-shop">job shop</a></li>
+					
+					<li><a href="/tags/np-hard">NP-hard</a></li>
+					
+				</ul>
+			</nav>
+			
+			
+		</div>
+		</article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/AnkilP" rel="me" title="GitHub"><i data-feather="github"></i></a>
+    <a class="border"></a><a class="soc" href="https://gitlab.com/athul/" rel="me" title="GitLab"><i data-feather="gitlab"></i></a>
+    <a class="border"></a><a class="soc" href="https://instagram.com/randommoleculez" rel="me" title="Instagram"><i data-feather="instagram"></i></a>
+    <a class="border"></a><a class="soc" href="mailto:ankil335@gmail.com" rel="me" title="Email"><i data-feather="email"></i></a>
+    <a class="border"></a><a class="soc" href="https://linkedin.com/in/ankil-patel" rel="me" title="Email"><i data-feather="linkedin"></i></a>
+    <a class="border"></a></div>
+  <div class="footer-info">
+    2023  © Ankil |  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+  </div>
+</footer>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'G-YXFJCKLYLT', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+<script>
+  feather.replace()
+</script></div>
+    </body>
+</html>

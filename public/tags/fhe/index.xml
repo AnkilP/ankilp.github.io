@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>fhe on Ankil Patel</title>
+    <link>https://ankilp.github.io/tags/fhe/</link>
+    <description>Recent content in fhe on Ankil Patel</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© Ankil</copyright>
+    <lastBuildDate>Mon, 21 Sep 2020 00:54:53 -0400</lastBuildDate><atom:link href="https://ankilp.github.io/tags/fhe/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ensnif</title>
+      <link>https://ankilp.github.io/posts/ensnif/</link>
+      <pubDate>Mon, 21 Sep 2020 00:54:53 -0400</pubDate>
+      
+      <guid>https://ankilp.github.io/posts/ensnif/</guid>
+      <description>Update This project is no longer active.
+Motivation As Andrew Trask from OpenMined puts it (and I&amp;rsquo;m paraphrasing here): there are cases where public information is found in private information. The canonical example given by Trask is of building a cancer detection model using patient data: the model itself is not representative of any specific person but the individual data point used to build the model is unique. This private information is collected under the explicit trust (sometimes implicit) that the information won&amp;rsquo;t be divulged (through any means).</description>
+    </item>
+    
+  </channel>
+</rss>
