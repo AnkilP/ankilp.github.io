@@ -18,3 +18,5 @@ By the 90km mark, I had figured out how to pace myself and didn't need to convin
 
 That kind of closure isn't accessible to everyone. Along the way, I met folks that had lost parents, siblings, relatives, friends, and children to cancer. I even met someone that had had chemo the week before. It was inspiring and heartbreaking to see how cancer had and continues to affect everyone and how despite that, folks persevere. If you're interested in donating, send me an email at <ankil335@gmail.com>. 
 
+I have some [pictures](https://www.instagram.com/p/Cpb9soVOGpl/?igshid=MmU2YjMzNjRlOQ==) of the event.
+
