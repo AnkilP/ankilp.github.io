@@ -57,4 +57,4 @@ Imagine a guy taking a few hours to build a sandcastle, and then another guy sto
 
 ## Appendix B
 
-Oscar also mentioned that this happens with marathon times. Someone thinks no human could break X record. And then after a while, someone breaks that record. And then there's ten other people that cross that barrier that everyone thought was impossible. I'm more convinced that if someone can show that something is possible, others will follow. Grant's brought up npm: "npm was terrible and slow for ages until Meta made Yarn (which was good), and then npm suddenly got really good really fast."
+Oscar also mentioned that this happens with marathon times. Someone thinks no human could break X record. And then after a while, someone breaks that record. And then there's ten other people that cross that barrier that everyone thought was impossible. I'm more convinced that if someone can show that something is possible, others will follow. Grant brought up npm: "npm was terrible and slow for ages until Meta made Yarn (which was good), and then npm suddenly got really good really fast."
