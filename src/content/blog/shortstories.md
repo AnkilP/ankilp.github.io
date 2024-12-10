@@ -33,8 +33,6 @@ Movies like [Ophelia](https://www.imdb.com/title/tt5690810/) and [The Green Knig
 
 I want the reader to read this short story twice: once in confusion and another time knowing it's about Fleance and Macbeth. Ultimately, I want readers to walk away asking themselves if Fleance's inherent ambition surfaces in the same way it spurred Macbeth into his tragic missteps.
 
-> Prompt: have an argument b/w two people over something trivial but have it tease a larger issue without explicitly stating it
-
 > _The flame from the small diya dances in the red clay. Its warmth belies a strangely sharp and offensive glow._
 >
 > Come, receive the blessings of our pooja.
@@ -45,7 +43,7 @@ I want the reader to read this short story twice: once in confusion and another 
 >
 > What is the purpose of this? Why does waving my hand over this flame mean anything?
 >
-> We’re Indian - this is who we are.
+> These are our traditions. Our traditions have shaped our communities for a thousand years. We’re Indian - this is who we are.
 >
 > Are we in India right now?
 >
@@ -53,15 +51,25 @@ I want the reader to read this short story twice: once in confusion and another 
 >
 > Forget what? I’ve literally spent more time studying for exams than I have physically in India.
 >
-> So what!
+> So what!?
 >
-> _A palpable silence ate up the space between them and choked their words._
+> I know India as gulab jamuns and Utrayan and Mahabharat and Shakuntal and the Taj Mahal… the same way a tourist sees India! Traditions don’t make sense in vacuums. I have to make a choice. What am I? Am I an Indian in Canada or am I Indo-Canadian?
 >
-> I know India as gulab jamuns and Utrayan and Mahabharat and Shakuntal and the Taj Mahal… the same way a tourist sees India! Traditions don't make sense in vaccuums. And we're not even adjacent to India - there's no cultural gradient. I have to make a choice. Who am I?
->
-> _A silence washes over both of them again._
+> _A silence washes over both of them. It takes a moment for her to find her voice but she is determined to be heard._
 >
 > Your great-great grandfather marched with Gandhi in defiance of the salt tax. Your great-grandmother died from a stray bullet during a demonstration for untouchables. Your grandparents survived countless chaotic Hindu-Muslim riots. Your ancestors shaped India’s story, refined her delicacies, built her temples and fought for her beauty. You are a product of the Indian story, whether you identify by it or not.
+>
+> This product of the Indian story isn’t rejecting his heritage. This product of the Indian story is rejecting the old country pettiness and jealousy that drags us down to the lowest common denominator. The sins that made us should not make us sinners. This product of the Indian story wants to create his own story. This product of the Indian story wants to choose.
+>
+> _She pauses to contemplate his frustration, realizing she herself was glad to be free of the societal pressures that had crushed her dreams._
+>
+> It’s ok if your accent doesn’t have my Sanskrit. Sanskrit is in your name. Your name means an offering to the god of destruction, Shiva. His Tandava is meant to bring the universe to darkness. But that is a western bastardization. Shiva is more than The Destroyer. The opening of the third eye beckons the rebirth of the world. Shiva represents freedom. Freedom to rebuild the world. Freedom from expectations. Freedom from traditions. Freedom from cynicism. Freedom to reinvent yourself. So, who are you?
+>
+> _He paused, her words heavy in the stillness. With deliberate care, he reached out to the flame, cupping it gently against the wind - both commiting to memory its soft tender warmth and shielding it from the quiet erosion of time._
+>
+> I am Ankil
+>
+> PS: my name does mean an offering to Shiva
 
 I struggled to reconcile my identity as a first-generation immigrant. For the better part of my formative years, there was an atheist/existentialist strain that took hold and it created a rift between me and people I admired but ultimately disagreed with fundamentally. It sadly took me too long to lose the atheist militancy and finally appreciate that perspective. For instance, I didn't appreciate how poetic and beautifully written the Mahabharat was - for reference, the epic is on the same scale as the Odyssey or the Illiad. I wonder if my western sensibilities colour how I see these stories and suggest values that may be neither inherent nor warranted. I wonder if I made the mistake of confusing storytelling strategies with the value or sophistication of a story.
 
