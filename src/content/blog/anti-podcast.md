@@ -13,7 +13,7 @@ tags:
 description: How can we preserve nuance without making knowledge inaccessible?
 ---
 
-In an era of abundant information, we grapple daily with a difficult tradeoff: the tension between high fidelity (deep expertise, complexity, and nuance) and high understanding (clarity, approachability, and usability). We often compromise depth for breadth, or fidelity for accessibility. But what if we could find ways to balance both?
+In an era of abundant information, we grapple daily with a difficult tradeoff: the tension between high fidelity (deep expertise, complexity, and nuance) and high understanding (clarity, approachability, and usability). We often compromise depth for breadth, or fidelity for accessibility. But what if we could have both?
 
 Patrick Collison tweeted about what makes great leaders. And his thoughts centered on three criteria:
 
