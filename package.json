@@ -1,6 +1,7 @@
 {
-  "name": "tidal-transit",
+  "name": "ankilp-github-io",
   "version": "4.7.0",
+  "packageManager": "pnpm@9.14.2",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
