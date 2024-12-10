@@ -15,7 +15,7 @@ description: The distributed system world is up for a paradigm shift
 
 ## Motivation
 
-I asked Scott (one of my co-founders and previous manager) about how to build resilient systems and his response was that I had the wrong idea. The holy grail wasn’t in resilient systems - it was in anti fragile systems (from the book by Taleb). Anti-fragile systems are able to learn and become better with new stressors. How do we build antifragile systems? I believe that framing complex systems problems as pure optimization problems lets us create AI agents that can adapt to new information and learn more efficiently.
+The holy grail isn't in resilient systems - it's in anti fragile systems (from the book by Taleb). Anti-fragile systems are able to learn and become better with new stressors. How do we build antifragile systems? I believe that framing complex systems problems as pure optimization problems lets us create AI agents that can adapt to new information and learn more efficiently.
 
 A part of me wondered how many of the system-level issues we saw came from insufficient designs, changing environments that were no longer suitable to the implementation, terrible metrics (or lack thereof) and intuitive decision-making vs data-driven processes. Unfortunately, most of these problems are endemic to the entire industry, partly because of inertia, lack of infrastructure and de-prioritization because these issues aren’t visible to customers. However, the drivers behind decision-making are still cost, efficiency and productivity so I can see how the solutions outlined in this post address KPIs that businesses are measuring.
 
