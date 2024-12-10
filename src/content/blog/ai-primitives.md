@@ -23,14 +23,14 @@ I understand why it’s been designed this way: classical control theory has rig
 
 Taleb in his book Antifragile talks about stressors to systems and I loosely interpret them as any form of disruption to the system outside of the anticipated use cases. For example, a large traffic spike is a stressor that risks crashing many services or severely reducing customer retention.
 
-We need to combine long-term or cyclical stressors with short-term stressors and input them into something I call the systems layer. The systems layer understands the system intimately, not just as a collection of services but the holistic system as a whole. It can infer system dynamics to figure out what sequence of actions caused issues and bottlenecks and what sequence of actions solved it. It understands how to apply hypotheses to the dependency graph to understand how the system behaves given some hypothetical situation. We're building towards this in our startup btw ([https://debugging.sucks](https://debugging.sucks)).
+We need to combine long-term or cyclical stressors with short-term stressors and input them into something I call the systems layer. The systems layer understands the system intimately, not just as a collection of services but the holistic system as a whole. It can infer system dynamics to figure out what sequence of actions caused issues and bottlenecks and what sequence of actions solved it. It understands how to apply hypotheses to the dependency graph to understand how the system behaves given some hypothetical situation. 
 
 What if we could intelligently query the system so that:
 
 1. primitives can actively tune themselves based on immediate stressors and historical data that’s been filtered so only relevant information comes up
 2. we can ask where the system failed before and recreate those scenarios to test primitives, i.e. hypothesis testing
 
-Note, this blog post is not about the startup.
+## System Primitives
 
 My first thought was to create a learning agent that can adjust parameters on a config file since systems are strung together with config files as interfaces - e.g. the agent could tune the heap size before the garbage collector started according to some traffic distribution. A config file has very specific assumptions about the system/component, the types and the format. However, it’s not an intrinsic part of the system, it’s just an interface to the system. An agent that adjusts config files would be easier to sell and integrate into tech stacks, but we need to make assumptions about the behavior of the underlying service and integrity of the interface (e.g. fields in the config that get ignored in the code). This suggests to me that config files are really second class system primitives. So let’s introduce a first class system primitive by highlighting the difference between a first class and second class primitive: a first class primitive is an intrinsic aspect of the system and can evolve with the system whereas a second class primitive is a proxy to the system and requires collaboration between teams. Moreover, it can involve shims and careful engineering work to migrate to new deployments.
 
