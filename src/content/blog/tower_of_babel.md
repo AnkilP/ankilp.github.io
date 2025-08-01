@@ -2,7 +2,7 @@
 title: Tower of Babel
 author: Ankil Patel
 pubDatetime: 2025-01-13T00:14:09-06:59
-slug: tower of babel
+slug: tower-of-babel
 featured: true
 draft: false
 tags:
