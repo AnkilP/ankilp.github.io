@@ -3,7 +3,7 @@ title: Imagination vs Intelligence
 author: Ankil Patel
 pubDatetime: 2024-09-05
 slug: imagination-vs-intelligence
-featured: true
+featured: false
 draft: false
 tags:
   - intelligence

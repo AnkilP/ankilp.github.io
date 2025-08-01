@@ -3,7 +3,7 @@ title: Poems
 author: Ankil Patel
 pubDatetime: 2022-10-17T03:15:58-07:00
 slug: poetry
-featured: true
+featured: false
 draft: false
 tags:
   - jazz

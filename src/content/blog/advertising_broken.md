@@ -3,7 +3,7 @@ title: Advertising is (Partially) Broken
 author: Ankil Patel
 pubDatetime: 2022-10-17T00:30:32-07:00
 slug: advertising-partially-broken
-featured: true
+featured: false
 draft: false
 tags:
   - advertising

@@ -2,7 +2,7 @@
 title: Ensnif
 author: Ankil Patel
 pubDatetime: 2020-09-21T00:54:53-04:00
-slug: Privacy-preserving-platform-to-host-data
+slug: ensnif
 featured: false
 draft: false
 tags:

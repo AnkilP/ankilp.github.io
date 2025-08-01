@@ -3,7 +3,7 @@ title: Fashion after climate change
 author: Ankil Patel
 pubDatetime: 2024-10-23
 slug: fashion
-featured: true
+featured: false
 draft: false
 tags:
   - fashion
