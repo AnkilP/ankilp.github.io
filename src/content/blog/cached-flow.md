@@ -1,5 +1,5 @@
 ---
-title: Shooting Method and MPC for Cross-Prompt Caching in Rectified Flow Models
+title: Shooting Method and MPC for Cross-Prompt Caching in Stable Diffusion 3
 author: Ankil Patel
 pubDatetime: 2025-07-24T00:28:00-08:00
 slug: shooting-mpc-rectified-flow-caching
@@ -15,7 +15,7 @@ description: Using shooting method and MPC to enable high-quality trajectory con
 ---
 
 
-# Shooting Method and MPC for Cross-Prompt Caching in Rectified Flow Models
+# Shooting Method and MPC for Cross-Prompt Caching in Stable Diffusion 3
 
 | ![Image 1](assets/images/success.png) | ![Image 2](assets/images/success_3.png) | ![Image 3](assets/images/sunset.png) |
 |:---:|:---:|:---:|
@@ -23,15 +23,17 @@ description: Using shooting method and MPC to enable high-quality trajectory con
 
 ## Abstract
 
-I present a shooting method and MPC approach for cross-prompt trajectory continuation in rectified flow models. Rectified flows use straight-line paths from noise to data - when switching prompts mid-generation, the velocity field suddenly points toward a different target, creating a discontinuity the model wasn't trained for. I treat this as trajectory optimization: find the optimal control sequence to smoothly transition between prompts. Results: 2.31x speedup with maintained quality (39.5 dB PSNR) for similar prompts, versus catastrophic failure (15 dB) with naïve caching.
+I present a shooting method and MPC approach for cross-prompt trajectory continuation in Stable Diffusion 3's rectified flow implementation. Rectified flows use straight-line paths from noise to data - when switching prompts mid-generation, the velocity field suddenly points toward a different target, creating a discontinuity the model wasn't trained for. I treat this as trajectory optimization: find a control sequence to smoothly transition between prompts. Results on SD3: 2.31x speedup with maintained quality (39.5 dB PSNR) for very similar prompts (>95% similarity), degrading to 1.10x speedup at 85% similarity. Direct switching without optimization produces unusable 15 dB PSNR results.
 
 ## 1. The Problem
 
-Rectified flow models like SD3 follow deterministic straight-line trajectories:
+SD3 uses flow matching to learn rectified flows - deterministic straight-line trajectories between data and noise:
 ```
 x_t = (1 - t)x_0 + t·x_1
 dx/dt = v_θ(x_t, t, c)
 ```
+
+Flow matching is the training objective that teaches the model to predict velocities along these straight paths.
 
 When switching prompts at time `t_switch`:
 ```
@@ -51,11 +53,51 @@ angle = arccos(v_old · v_new / (||v_old|| ||v_new||))
 # Result: up to 75° divergence for different prompts!
 ```
 
-This large angular difference meant simple interpolation would take the trajectory off the learned manifold. The realization: this is fundamentally a trajectory optimization problem requiring control theory, not just a blending problem.
+This large angular difference meant simple interpolation would take the trajectory off the learned manifold. The realization: this is a trajectory optimization problem - and control theory has existing methods (shooting, MPC) that could be applied here.
 
-## 2. Control-Theoretic Solution
+## 2. Key Assumptions
 
-I formulate prompt switching as optimal control:
+### Core Assumption: Semantic Similarity → Latent Similarity
+
+The entire approach rests on this assumption:
+```
+If similarity(prompt_A, prompt_B) > threshold
+Then ||latent_A(t) - latent_B(t)|| < ε for same t
+```
+
+This assumes that semantically similar prompts produce similar intermediate latents at the same timestep. 
+
+**Why this might hold:**
+- Text encoders map similar concepts to nearby embeddings
+- Rectified flows interpolate linearly, preserving relative distances
+- Limited empirical observation on SD3 suggests this works for high similarity
+
+**When it breaks:**
+- Style modifiers ("photorealistic" vs "cartoon") can dramatically shift latent space despite semantic similarity
+- Negation ("with car" vs "without car") flips meaning but maintains high token overlap
+- Different word order can preserve similarity score but change generation path
+
+### Secondary Assumptions
+
+1. **Trajectory Smoothness**: The optimal transition between prompts follows a smooth path (C² continuous)
+2. **Local Linearity**: Velocity fields can be locally linearized for MPC
+3. **Manifold Connectivity**: Valid latents from different prompts lie on a connected manifold
+
+### Critical Caveats
+
+1. **Training Distribution Mismatch**: If the model wasn't trained on mid-trajectory prompt switches, the velocity field might not generalize well to these "off-distribution" transitions.
+
+2. **Accumulated Error**: Switching prompts mid-flow could amplify numerical integration errors, especially if the new trajectory diverges significantly from the original.
+
+3. **Prompt Embedding Space**: If the prompt embeddings are very different, the velocity field might produce unrealistic transitions or artifacts.
+
+4. **Loss of Coherence**: The generated content might lose semantic consistency across the switch point.
+
+5. **Unknown Concept Manifestation**: We don't know when specific concepts manifest during the flow steps. A "sunset" modifier might establish color palette early (step 10) or late (step 40). Without this knowledge, it's hard to determine the optimal cache point - too early and we miss established features, too late and we can't meaningfully change them.
+
+## 3. Applying Control Theory to Trajectory Optimization
+
+I formulate prompt switching as an optimal control problem, allowing us to use established methods:
 
 **State dynamics:**
 ```
@@ -69,7 +111,36 @@ min J = ∫[||x_T - x_target||² + λ||u_t||² + γ||dc_t/dt||²] dt
 
 This minimizes final error, control effort, and transition abruptness.
 
-## 3. Shooting Method for Trajectory Planning
+### Trajectory Behavior During Transition
+
+The key insight: we're not trying to instantly jump to the new trajectory. Instead, there's a transition period where:
+
+```
+t < t_cache: Original linear trajectory (prompt A)
+t_cache < t < t_cache + Δt: Smooth transition curve
+t > t_cache + Δt: New linear trajectory (prompt B)
+```
+
+The shooting method attempts to find a transition curve that:
+1. Starts from the cached point on trajectory A
+2. Smoothly curves through the transition period
+3. Eventually aligns with the straight-line trajectory toward prompt B's target
+
+This transition period (typically 5-8 steps) is crucial - too short and we get artifacts, too long and we lose the benefits of caching. Note: The method finds a plausible transition, not necessarily the optimal one, as no ground truth exists for cross-prompt transitions.
+
+### Visual Comparison of Approaches
+
+**Direct Switch from Cache (No Transition):**
+![Direct Switch](assets/images/cache_1.png)
+*Result: 15.2 dB PSNR - Catastrophic failure with severe artifacts*
+
+**Linear Interpolation Without Optimization:**
+![Linear Interpolation](assets/images/content.png)
+*Result: Severe artifacts and corruption from off-manifold trajectories*
+
+These images demonstrate why sophisticated trajectory optimization is necessary. Direct switching creates velocity field discontinuities that produce severe artifacts. Linear interpolation improves slightly but still fails because the interpolated velocities don't stay on the learned manifold.
+
+## 4. Shooting Method for Trajectory Planning
 
 The shooting method finds optimal trajectories by iteratively refining initial velocities:
 
@@ -141,7 +212,7 @@ def multiple_shooting(x_cached, t_switch, old_prompt, new_prompt, num_segments=3
     return segment_velocities[0]
 ```
 
-## 4. MPC for Real-Time Correction
+## 5. MPC for Real-Time Correction
 
 While shooting provides global planning, MPC handles real-time corrections:
 
@@ -165,19 +236,19 @@ class MPCController:
         return u_sequence[0]
 ```
 
-## 5. Why Simple Approaches Failed
+## 6. Why Simple Approaches Failed
 
 Initial attempts with direct prompt switching and linear blending produced poor results:
 
 | Approach | PSNR | Visual Quality |
 |----------|------|----------------|
 | Direct switch | 15.2 dB | Corrupted |
-| Linear blend | 22.4 dB | Artifacts |
+| Linear blend | Poor | Severe artifacts |
 | Needed | >38 dB | Production quality |
 
-The problem: velocity field discontinuity when switching prompts mid-generation. This led to recognizing we needed trajectory optimization, not just interpolation.
+The problem: velocity field discontinuity when switching prompts mid-generation. This led to recognizing we had a trajectory optimization problem, for which control theory offers established solutions.
 
-## 6. Implementation Details
+## 7. Implementation Details
 
 ### Adaptive Blending Schedule
 
@@ -212,7 +283,15 @@ class ComprehensiveCacheEntry:
     generator_state: Dict[str, Any]  # Full CUDA state
 ```
 
-## 7. Combined Algorithm
+### SD3-Specific Considerations
+
+SD3's flow matching implementation has unique characteristics:
+1. **Shifted timesteps**: Uses `shift=3.0` for numerical stability
+2. **Velocity prediction**: Model outputs velocity v_θ, not noise ε_θ
+3. **FlowMatchEulerDiscreteScheduler**: Custom scheduler for rectified flow integration
+4. **No noise injection**: Unlike DDPM/DDIM, the process is fully deterministic
+
+## 8. Combined Algorithm
 
 ```python
 def cached_generation_with_shooting_mpc(self, prompt, cache):
@@ -264,17 +343,21 @@ def cached_generation_with_shooting_mpc(self, prompt, cache):
     return self.decode(x_t)
 ```
 
-## 8. Results
+## 9. Results
+
+Note: All results are from limited testing on SD3 with a small set of prompt pairs. PSNR measurements are approximate and computed on generated 1024x1024 images. "Similarity" refers to cosine similarity of CLIP text embeddings.
 
 ### Trajectory Planning Performance
 
-| Method | Planning Time | Trajectory Error | PSNR |
+| Method | Planning Time | Trajectory Error* | PSNR |
 |--------|--------------|------------------|------|
-| Direct switch | 0ms | 0.892 | 15.2 dB |
-| Linear blend | 1ms | 0.453 | 22.4 dB |
-| Single shooting | 45ms | 0.087 | 35.7 dB |
-| Multiple shooting | 112ms | 0.041 | 38.2 dB |
-| Shooting + MPC | 45ms + 3ms/step | 0.023 | 39.1 dB |
+| Direct switch | 0ms | 0.892 | ~15 dB |
+| Linear blend | 1ms | 0.453 | Poor (severe artifacts) |
+| Single shooting | 45ms | 0.087 | ~36 dB |
+| Multiple shooting | 112ms | 0.041 | ~38 dB |
+| Shooting + MPC | 45ms + 3ms/step | 0.023 | ~39 dB |
+
+*Trajectory error is a synthetic metric measuring deviation from predicted paths
 
 ### Performance vs Similarity
 
@@ -288,14 +371,14 @@ def cached_generation_with_shooting_mpc(self, prompt, cache):
 ### Computational Overhead
 - Shooting: 45-112ms (1.5-3.8% of generation time)
 - MPC: ~3ms per step (6% overhead for 50 steps)
-- Total: <6% overhead for 2.31x speedup
+- Similarity computation: ~5ms
+- Cache lookup: ~2ms
+- Total: ~10% overhead in best case (>95% similarity for 2.31x speedup)
+- Note: Speedup drops to 1.10x at 85% similarity, making overhead less worthwhile
 
-## Key Insights
+## Summary
 
-1. **Rectified flows need exact continuity** - straight-line trajectories can't tolerate deviations
-2. **Complete state management is critical** - partial state saving causes quality loss
-3. **Control theory provides elegant solutions** - shooting + MPC balances global planning with local correction
-4. **Small overhead, big gains** - <6% compute for 2x+ speedup
+The shooting method and MPC approach enables cross-prompt caching in SD3, but with significant limitations. It works well only for very similar prompts (>95% similarity), requires complete state management including scheduler details, and the computational overhead means diminishing returns for less similar prompts. The methods are borrowed from control theory and adapted to handle the velocity field discontinuities in rectified flows.
 
 ## Future Directions
 
@@ -303,18 +386,6 @@ def cached_generation_with_shooting_mpc(self, prompt, cache):
 - Learned MPC weights from user preferences
 - Extension to video generation with temporal consistency
 - Multi-prompt batch optimization
-
-## References
-
-[1] Lipman, Y., et al. "Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow." ICLR (2023).
-
-[2] Liu, X., et al. "Flow Matching for Generative Modeling." arXiv:2403.03206 (2024).
-
-[3] Betts, J.T. "Practical Methods for Optimal Control Using Nonlinear Programming." SIAM (2010).
-
-[4] Mayne, D.Q., et al. "Constrained model predictive control: Stability and optimality." Automatica (2000).
-
-[5] Stable Diffusion 3 Technical Report. Stability AI (2024).
 
 ## Appendix: Debugging Journey
 
@@ -385,17 +456,20 @@ After pipeline call:
   timesteps: tensor([1000., 958., 916., ...])  # Full schedule!
 ```
 
-### Debug Phase 4: Rectified Flow Mathematics
+### Debug Phase 4: Flow Matching and Rectified Flow Mathematics
 
-**Realization:** Rectified flows follow straight-line trajectories:
+**Realization:** SD3 uses flow matching to learn rectified flows with straight-line trajectories:
 ```
 x_t = (1 - t)x_0 + t·x_1
 ```
 
 Key properties:
-1. Trajectories never cross
-2. Each point has unique path to target
-3. Integration step size `dt` must be exact
+1. **Flow matching**: The training objective that minimizes ||v_θ(x_t, t) - (x_1 - x_0)||²
+2. **Rectified flows**: The resulting straight-line trajectories from data to noise
+3. **Deterministic**: No stochastic sampling, unlike DDPM
+4. Integration step size `dt` must be consistent
+
+The distinction matters because flow matching could theoretically learn curved trajectories, but SD3 specifically uses it to learn rectified (straight) flows.
 
 **Implication:** Can't just restart from cached latent with new schedule - must preserve exact trajectory.
 
@@ -440,7 +514,7 @@ Final implementation achieves:
 - 2.31x speedup
 - Exact trajectory preservation
 
-**Critical lesson:** After fixing the scheduler state issue, I still had a fundamental problem - switching prompts mid-generation created velocity field discontinuities that simple blending couldn't handle. The breakthrough came from recognizing this as a trajectory optimization problem that required control theory. The shooting method could find globally optimal transitions, while MPC provided real-time corrections. This wasn't obvious - it required understanding that rectified flows' straight-line trajectories made the discontinuity problem severe enough to need sophisticated optimization.
+**Critical lesson:** After fixing the scheduler state issue, I still had a fundamental problem - switching prompts mid-generation created velocity field discontinuities that simple blending couldn't handle. The breakthrough came from recognizing this as a trajectory optimization problem and realizing that control theory already had tools for this: shooting methods for trajectory planning and MPC for real-time corrections. The key insight wasn't that control theory was "the answer," but that existing control methods could be adapted to this specific problem in rectified flows.
 
 ### Computational Challenges of Shooting and MPC
 
@@ -486,10 +560,11 @@ v_init_2 = v_blend - 0.001
 ```python
 def compute_jacobian_wrt_state(self, x_t, t, old_prompt, new_prompt, alpha):
     # Finite differences require 2*latent_dim model evaluations
-    # For 128x128 latent: 2 * 16384 * 50ms = 27 minutes!
+    # For 128x128 latent: 2 * 16384 * 50ms = 27 minutes (worst case)
     
-    # Solution: Structured sparsity assumption
-    # Only compute diagonal blocks: 2 * 16 * 50ms = 1.6s
+    # Practical approximation: Assume local interactions
+    # Compute only local neighborhoods: reduces to seconds
+    # Note: This approximation may miss global interactions
 ```
 
 **Problem 3: QP Solver Numerical Stability**
@@ -614,17 +689,17 @@ def compute_trajectory_error(self, x_terminal, v_terminal, new_prompt):
 3. **Geodesic Interpolation**:
    ```python
    # Find shortest path on the data manifold
-   # (Though as you noted, trajectories don't cross in rectified flows)
+   # (Trajectories don't cross in rectified flows however...)
    ```
 
 #### Why Shooting Method Is Necessary Despite No Ground Truth
 
 The empirical results show simpler approaches fail badly:
 - Direct switch: 15.2 dB PSNR (unusable)
-- Linear blend: 22.4 dB PSNR (poor quality)
+- Linear blend: Poor quality with severe artifacts
 - Shooting + MPC: 39.1 dB PSNR (near perfect)
 
-This 17 dB improvement isn't marginal - it's the difference between garbage and high-quality output.
+The improvement from ~15 dB to ~39 dB represents the difference between unusable and high-quality output.
 
 #### What Makes Shooting Method Work
 
@@ -636,7 +711,7 @@ Even without ground truth, the shooting method discovers trajectories that:
 
 3. **Satisfy boundary conditions** - The trajectory must smoothly connect the cached state to a valid endpoint for the new prompt
 
-The key insight: While we don't know the "correct" trajectory, we can identify trajectories that the model can successfully follow without diverging.
+While we don't know the "correct" trajectory, we can find trajectories that the model can follow without producing artifacts.
 
 #### Why Simple Blending Fails
 
@@ -657,3 +732,77 @@ v_blend = (1-α)*v_old + α*v_new
 ```
 
 The shooting method succeeds by finding trajectories that stay on the learned manifold throughout the transition, rather than naively interpolating in velocity space.
+
+### GPU Memory Transfer Costs
+
+A critical consideration: is caching worth the GPU↔CPU transfer overhead?
+
+```python
+# Latent size for SD3 at 1024x1024 resolution
+latent_shape = (1, 16, 128, 128)  # 262,144 elements
+dtype = torch.float16  # 2 bytes per element
+latent_size = 512 KB
+
+# Transfer timing (PCIe 4.0 x16)
+gpu_to_cpu = 0.8ms  # Measured on RTX 4090
+cpu_to_gpu = 0.7ms  # Slightly faster
+total_overhead = 1.5ms per cache operation
+
+# Compared to compute saved
+steps_saved = 25  # For 50% caching
+time_per_step = 40ms  # SD3 on RTX 4090
+compute_saved = 1000ms
+
+# Net benefit
+speedup = compute_saved / (compute_saved/2 + total_overhead)
+# = 1000 / (500 + 1.5) = 1.99x (worth it!)
+```
+
+#### When It's NOT Worth It
+
+```python
+# Small images or few steps saved
+if steps_saved < 5:
+    # 5 * 40ms = 200ms saved
+    # 1.5ms overhead = 0.75% overhead
+    # But shooting method adds 45ms...
+    # Net speedup: only 1.15x
+    
+# Memory pressure
+if gpu_memory_available < 2GB:
+    # CPU caching forces more swapping
+    # Can actually slow down overall
+```
+
+#### Optimization: Keep Hot Caches on GPU
+
+```python
+class HybridCache:
+    def __init__(self, gpu_capacity=10, cpu_capacity=1000):
+        self.gpu_cache = OrderedDict()  # LRU
+        self.cpu_cache = OrderedDict()
+        
+    def save(self, key, latent, metadata):
+        if len(self.gpu_cache) < self.gpu_capacity:
+            # Keep on GPU - no transfer cost!
+            self.gpu_cache[key] = (latent, metadata)
+        else:
+            # Evict LRU to CPU
+            old_key, (old_latent, old_meta) = self.gpu_cache.popitem(last=False)
+            self.cpu_cache[old_key] = (old_latent.cpu(), old_meta)
+            self.gpu_cache[key] = (latent, metadata)
+```
+
+**Bottom line**: GPU↔CPU transfer is worth it for >10 steps saved, but keeping frequently-used caches on GPU is even better.
+
+## References
+
+[1] Lipman, Y., et al. "Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow." ICLR (2023).
+
+[2] Liu, X., et al. "Flow Matching for Generative Modeling." arXiv:2403.03206 (2024).
+
+[3] Betts, J.T. "Practical Methods for Optimal Control Using Nonlinear Programming." SIAM (2010).
+
+[4] Mayne, D.Q., et al. "Constrained model predictive control: Stability and optimality." Automatica (2000).
+
+[5] Stable Diffusion 3 Technical Report. Stability AI (2024).
