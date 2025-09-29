@@ -46,8 +46,6 @@ jobs:
       
       - name: Build Astro
         run: pnpm build
-        env:
-          PUBLIC_GOOGLE_ANALYTICS_ID: ${{ secrets.PUBLIC_GOOGLE_ANALYTICS_ID }}
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
