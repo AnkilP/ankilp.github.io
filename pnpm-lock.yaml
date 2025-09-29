@@ -32,6 +32,9 @@ importers:
       mdast-util-to-string:
         specifier: ^4.0.0
         version: 4.0.0
+      partytown:
+        specifier: ^0.0.0
+        version: 0.0.0
       reading-time:
         specifier: ^1.5.0
         version: 1.5.0
@@ -2126,6 +2129,9 @@ packages:
 
   parse5@7.2.1:
     resolution: {integrity: sha512-BuBYQYlv1ckiPdQi/ohiivi9Sagc9JG+Ozs0r7b/0iK3sKmrb0b9FdWdBbOdx6hBCM/F9Ir82ofnBhtZOjCRPQ==}
+
+  partytown@0.0.0:
+    resolution: {integrity: sha512-SrBEhwsjx5NeVZMuOdNgUKoKXVDDk2a+GTQmN0hbThc8KsvRp9D5HCidgMwuvUrUiG4XFvNnbS3Nj/Q5j6xLtg==}
 
   path-browserify@1.0.1:
     resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
@@ -5296,6 +5302,8 @@ snapshots:
   parse5@7.2.1:
     dependencies:
       entities: 4.5.0
+
+  partytown@0.0.0: {}
 
   path-browserify@1.0.1: {}
 
