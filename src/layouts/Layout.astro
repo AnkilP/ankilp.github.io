@@ -4,6 +4,7 @@ import "@styles/base.css";
 import { ViewTransitions } from "astro:transitions";
 
 const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
+const googleAnalyticsId = import.meta.env.PUBLIC_GOOGLE_ANALYTICS_ID;
 
 export interface Props {
   title?: string;
@@ -57,23 +58,28 @@ const structuredData = {
   class={`${scrollSmooth && "scroll-smooth"}`}
 >
   <head>
-    <!-- Google tag (gtag.js) -->
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-YXFJCKLYLT"></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-      gtag("consent", "default", {
-          ad_storage: "denied",
-          ad_user_data: "denied",
-          ad_personalization: "denied",
-          analytics_storage: "denied",
-      });
+    {googleAnalyticsId && (
+      <>
+        <!-- Google tag (gtag.js) -->
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}></script>
+        <script is:inline data-ga-id={googleAnalyticsId}>
+          const gaId = document.currentScript.getAttribute('data-ga-id');
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag("consent", "default", {
+              ad_storage: "denied",
+              ad_user_data: "denied",
+              ad_personalization: "denied",
+              analytics_storage: "denied",
+          });
 
-      gtag('config', 'G-YXFJCKLYLT');
-    </script>
+          gtag('config', gaId);
+        </script>
+      </>
+    )}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

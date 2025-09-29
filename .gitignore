@@ -30,3 +30,6 @@ pnpm-debug.log*
 !.yarn/sdks
 !.yarn/versions
 .pnp.*
+
+# npm lockfile (using pnpm)
+package-lock.json
