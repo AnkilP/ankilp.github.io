@@ -58,8 +58,8 @@ const structuredData = {
 >
   <head>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YXFJCKLYLT"></script>
-    <script>
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-YXFJCKLYLT"></script>
+    <script is:inline>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
         dataLayer.push(arguments);
@@ -120,6 +120,7 @@ const structuredData = {
 
     <!-- Google JSON-LD Structured data -->
     <script
+      is:inline
       type="application/ld+json"
       set:html={JSON.stringify(structuredData)}
     />
