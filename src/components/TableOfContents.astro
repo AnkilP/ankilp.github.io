@@ -1,0 +1,309 @@
+---
+// Table of Contents component for blog posts
+---
+
+<aside id="table-of-contents" class="toc-sidebar">
+  <div class="toc-container">
+    <h2 class="toc-title">Contents</h2>
+    <nav class="toc-nav">
+      <ul id="toc-list" class="toc-list">
+        <!-- ToC items will be populated by JavaScript -->
+      </ul>
+    </nav>
+  </div>
+</aside>
+
+<style>
+  .toc-sidebar {
+    @apply fixed left-4 top-1/2 z-20 hidden w-72 -translate-y-1/2 xl:block;
+  }
+
+  .toc-container {
+    @apply max-h-[70vh] overflow-y-auto rounded-lg bg-skin-fill p-4 shadow-lg;
+    border: 1px solid rgba(var(--color-border), 0.4);
+  }
+
+  .toc-title {
+    @apply mb-4 text-base font-bold text-skin-base;
+  }
+
+  .toc-nav {
+    @apply text-sm;
+  }
+
+  .toc-list {
+    @apply -mx-2;
+  }
+
+  .toc-list ul {
+    @apply ml-3;
+  }
+
+  .toc-list li {
+    @apply list-none;
+  }
+
+  .toc-list a {
+    @apply block rounded px-3 py-1.5 text-skin-base/70 no-underline transition-all hover:bg-skin-card hover:text-skin-base;
+    border: 1px solid transparent;
+  }
+
+  .toc-list a:hover {
+    border-color: rgba(var(--color-border), 0.3);
+  }
+
+  .toc-list a.active {
+    @apply bg-skin-card font-medium text-skin-accent;
+    border-color: rgba(var(--color-accent), 0.3);
+    box-shadow: 0 0 0 1px rgba(var(--color-accent), 0.1);
+  }
+
+  .toc-list a[data-level="2"] {
+    padding-left: 0.75rem;
+  }
+
+  .toc-list a[data-level="3"] {
+    @apply text-sm;
+    padding-left: 2rem;
+  }
+
+  .toc-list a[data-level="4"] {
+    @apply text-sm;
+    padding-left: 3.25rem;
+  }
+
+  .toc-list a[data-level="5"],
+  .toc-list a[data-level="6"] {
+    @apply text-xs;
+    padding-left: 4.5rem;
+  }
+
+  /* Progress indicator on active section */
+  .toc-list a.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background-color: rgb(var(--color-accent));
+    border-radius: 0 2px 2px 0;
+  }
+
+  .toc-list li {
+    position: relative;
+  }
+
+  /* Arrow/chevron indicators */
+  .toc-chevron {
+    @apply mr-1.5 inline-block text-xs text-skin-base/40 transition-transform duration-200;
+  }
+
+  .toc-list a:hover .toc-chevron {
+    @apply text-skin-base/60;
+  }
+
+  .toc-list a.active .toc-chevron {
+    @apply text-skin-accent/70;
+  }
+
+  /* Rotate chevron for expanded sections */
+  .toc-list li.has-children > a .toc-chevron {
+    @apply rotate-0;
+  }
+
+  .toc-list li.has-children.expanded > a .toc-chevron {
+    @apply rotate-90;
+  }
+
+  /* Style for items with children */
+  .toc-list li.has-children > a {
+    @apply font-medium;
+  }
+
+  /* Hide on smaller screens */
+  @media (max-width: 1279px) {
+    .toc-sidebar {
+      display: none;
+    }
+  }
+
+  /* Ensure main content has proper spacing on large screens */
+  @media (min-width: 1280px) {
+    .post-content-container {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    generateTableOfContents();
+    setupScrollSpy();
+  });
+
+  // Re-run after page transitions
+  document.addEventListener('astro:after-swap', function() {
+    generateTableOfContents();
+    setupScrollSpy();
+  });
+
+  function generateTableOfContents() {
+    const tocList = document.getElementById('toc-list');
+    const tocSidebar = document.getElementById('table-of-contents');
+    
+    if (!tocList || !tocSidebar) return;
+
+    // Find all headings in the article
+    const article = document.querySelector('#article');
+    if (!article) return;
+
+    const headings = article.querySelectorAll('h2, h3, h4, h5, h6');
+    
+    if (headings.length === 0) {
+      tocSidebar.style.display = 'none';
+      return;
+    }
+
+    tocSidebar.style.display = 'block';
+    tocList.innerHTML = '';
+
+    let currentLevel = 2;
+    let currentList = tocList;
+    const listStack = [tocList];
+    
+    // Track section numbers for hierarchical numbering
+    const sectionNumbers = [0, 0, 0, 0, 0, 0]; // Support up to h6
+    let h2Counter = 0;
+
+    headings.forEach((heading, index) => {
+      const level = parseInt(heading.tagName.charAt(1));
+      const text = heading.textContent;
+      const id = heading.id || `heading-${index}`;
+      
+      // Ensure heading has an ID
+      if (!heading.id) {
+        heading.id = id;
+      }
+
+      // Update section numbers
+      if (level === 2) {
+        h2Counter++;
+        sectionNumbers[0] = h2Counter;
+        // Reset all deeper levels
+        for (let i = 1; i < sectionNumbers.length; i++) {
+          sectionNumbers[i] = 0;
+        }
+      } else if (level > 2 && level <= 6) {
+        sectionNumbers[level - 2]++;
+        // Reset deeper levels
+        for (let i = level - 1; i < sectionNumbers.length; i++) {
+          sectionNumbers[i] = 0;
+        }
+      }
+
+      // Create list item
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = `#${id}`;
+      
+      // Add chevron for all items
+      const chevron = document.createElement('span');
+      chevron.className = 'toc-chevron';
+      chevron.innerHTML = '›';
+      a.appendChild(chevron);
+      
+      const sectionText = document.createElement('span');
+      sectionText.className = 'toc-text';
+      sectionText.textContent = text;
+      a.appendChild(sectionText);
+      
+      a.setAttribute('data-level', level.toString());
+      a.className = 'toc-link';
+      
+      li.appendChild(a);
+
+      // Handle nesting
+      if (level > currentLevel) {
+        // Need to go deeper
+        while (level > currentLevel && currentLevel < 6) {
+          const ul = document.createElement('ul');
+          const lastLi = currentList.lastElementChild;
+          if (lastLi) {
+            lastLi.appendChild(ul);
+          }
+          listStack.push(ul);
+          currentList = ul;
+          currentLevel++;
+        }
+      } else if (level < currentLevel) {
+        // Need to go up
+        while (level < currentLevel && listStack.length > 1) {
+          listStack.pop();
+          currentList = listStack[listStack.length - 1];
+          currentLevel--;
+        }
+      }
+
+      currentList.appendChild(li);
+      currentLevel = level;
+    });
+  }
+
+  function setupScrollSpy() {
+    const tocLinks = document.querySelectorAll('.toc-link');
+    if (tocLinks.length === 0) return;
+
+    const headings = Array.from(document.querySelectorAll('#article h2, #article h3, #article h4, #article h5, #article h6'));
+    
+    function updateActiveLink() {
+      let current = '';
+      
+      headings.forEach(heading => {
+        const rect = heading.getBoundingClientRect();
+        if (rect.top <= 100) {
+          current = heading.id;
+        }
+      });
+
+      tocLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+    }
+
+    // Add smooth scrolling to ToC links
+    tocLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Update active link on scroll
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateActiveLink();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    // Initial call
+    updateActiveLink();
+  }
+</script>

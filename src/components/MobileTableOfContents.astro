@@ -1,0 +1,231 @@
+---
+// Mobile Table of Contents component
+---
+
+<div id="mobile-toc" class="mobile-toc xl:hidden">
+  <button id="mobile-toc-toggle" class="mobile-toc-toggle" aria-expanded="false">
+    <svg class="toc-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="8" y1="6" x2="21" y2="6"></line>
+      <line x1="8" y1="12" x2="21" y2="12"></line>
+      <line x1="8" y1="18" x2="21" y2="18"></line>
+      <line x1="3" y1="6" x2="3.01" y2="6"></line>
+      <line x1="3" y1="12" x2="3.01" y2="12"></line>
+      <line x1="3" y1="18" x2="3.01" y2="18"></line>
+    </svg>
+    <span>Contents</span>
+    <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6,9 12,15 18,9"></polyline>
+    </svg>
+  </button>
+  
+  <div id="mobile-toc-content" class="mobile-toc-content" hidden>
+    <nav class="mobile-toc-nav">
+      <ul id="mobile-toc-list" class="mobile-toc-list">
+        <!-- ToC items will be populated by JavaScript -->
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<style>
+  .mobile-toc {
+    @apply sticky top-0 z-30 mb-6 mt-4;
+  }
+
+  .mobile-toc-toggle {
+    @apply flex w-full items-center justify-between rounded-lg border border-skin-line bg-skin-card px-4 py-3 text-sm font-medium text-skin-base transition-colors hover:bg-skin-card-muted focus:outline-none focus:ring-2 focus:ring-skin-accent;
+  }
+
+  .mobile-toc-toggle[aria-expanded="true"] .chevron {
+    @apply rotate-180;
+  }
+
+  .toc-icon {
+    @apply mr-2 h-5 w-5;
+  }
+
+  .chevron {
+    @apply h-4 w-4 transition-transform;
+  }
+
+  .mobile-toc-content {
+    @apply mt-2 rounded-lg border border-skin-line bg-skin-card p-4;
+  }
+
+  .mobile-toc-nav {
+    @apply text-sm;
+  }
+
+  .mobile-toc-list {
+    @apply -m-2;
+  }
+
+  .mobile-toc-list ul {
+    @apply ml-3;
+  }
+
+  .mobile-toc-list li {
+    @apply list-none;
+  }
+
+  .mobile-toc-list a {
+    @apply block rounded px-3 py-2 text-skin-base/70 no-underline transition-all hover:bg-skin-card-muted hover:text-skin-base active:bg-skin-accent/10;
+    border: 1px solid transparent;
+  }
+
+  .mobile-toc-list a:hover {
+    border-color: rgba(var(--color-border), 0.3);
+  }
+
+  .mobile-toc-list a.active {
+    @apply bg-skin-card-muted font-medium text-skin-accent;
+    border-color: rgba(var(--color-accent), 0.3);
+  }
+
+  /* Arrow/chevron indicators for mobile */
+  .mobile-toc-chevron {
+    @apply mr-1.5 inline-block text-xs text-skin-base/40;
+  }
+
+  .mobile-toc-list a:hover .mobile-toc-chevron {
+    @apply text-skin-base/60;
+  }
+
+  .mobile-toc-list a.active .mobile-toc-chevron {
+    @apply text-skin-accent/70;
+  }
+
+  .mobile-toc-list a[data-level="2"] {
+    padding-left: 0.75rem;
+  }
+
+  .mobile-toc-list a[data-level="3"] {
+    @apply text-sm;
+    padding-left: 2rem;
+  }
+
+  .mobile-toc-list a[data-level="4"],
+  .mobile-toc-list a[data-level="5"],
+  .mobile-toc-list a[data-level="6"] {
+    @apply text-xs;
+    padding-left: 3.25rem;
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    setupMobileToC();
+  });
+
+  document.addEventListener('astro:after-swap', function() {
+    setupMobileToC();
+  });
+
+  function setupMobileToC() {
+    const mobileToc = document.getElementById('mobile-toc');
+    const toggle = document.getElementById('mobile-toc-toggle');
+    const content = document.getElementById('mobile-toc-content');
+    const tocList = document.getElementById('mobile-toc-list');
+    
+    if (!mobileToc || !toggle || !content || !tocList) return;
+
+    // Find all headings in the article
+    const article = document.querySelector('#article');
+    if (!article) return;
+
+    const headings = article.querySelectorAll('h2, h3, h4, h5, h6');
+    
+    if (headings.length === 0) {
+      mobileToc.style.display = 'none';
+      return;
+    }
+
+    mobileToc.style.display = 'block';
+    tocList.innerHTML = '';
+
+    // Generate ToC structure
+    let currentLevel = 2;
+    let currentList = tocList;
+    const listStack = [tocList];
+
+    headings.forEach((heading, index) => {
+      const level = parseInt(heading.tagName.charAt(1));
+      const text = heading.textContent;
+      const id = heading.id || `heading-${index}`;
+      
+      // Ensure heading has an ID
+      if (!heading.id) {
+        heading.id = id;
+      }
+
+      // Create list item
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = `#${id}`;
+      
+      // Add chevron for all items
+      const chevron = document.createElement('span');
+      chevron.className = 'mobile-toc-chevron';
+      chevron.innerHTML = '›';
+      a.appendChild(chevron);
+      
+      const sectionText = document.createElement('span');
+      sectionText.textContent = text;
+      a.appendChild(sectionText);
+      
+      a.setAttribute('data-level', level.toString());
+      a.className = 'mobile-toc-link';
+      
+      li.appendChild(a);
+
+      // Handle nesting
+      if (level > currentLevel) {
+        while (level > currentLevel && currentLevel < 6) {
+          const ul = document.createElement('ul');
+          const lastLi = currentList.lastElementChild;
+          if (lastLi) {
+            lastLi.appendChild(ul);
+          }
+          listStack.push(ul);
+          currentList = ul;
+          currentLevel++;
+        }
+      } else if (level < currentLevel) {
+        while (level < currentLevel && listStack.length > 1) {
+          listStack.pop();
+          currentList = listStack[listStack.length - 1];
+          currentLevel--;
+        }
+      }
+
+      currentList.appendChild(li);
+      currentLevel = level;
+    });
+
+    // Setup toggle functionality
+    toggle.addEventListener('click', function() {
+      const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', (!isExpanded).toString());
+      content.hidden = isExpanded;
+    });
+
+    // Add smooth scrolling and auto-collapse
+    const tocLinks = tocList.querySelectorAll('a');
+    tocLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+          // Auto-collapse mobile ToC after selection
+          toggle.setAttribute('aria-expanded', 'false');
+          content.hidden = true;
+        }
+      });
+    });
+  }
+</script>
