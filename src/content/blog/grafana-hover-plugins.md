@@ -3,7 +3,7 @@ title: Building a Grafana Plugin That Shows Logs on Hover
 author: Ankil Patel
 pubDatetime: 2025-10-13
 slug: grafana-hover
-featured: false
+featured: true
 draft: false
 tags:
   - debugging
