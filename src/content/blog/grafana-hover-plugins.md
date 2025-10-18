@@ -32,7 +32,7 @@ Here's the typical debugging flow:
 7. Realize you need to check a different service
 8. Repeat steps 3-7
 
-I think this points to an inherent issue in the observability landscape: data is highly fragmented and causations are hard to identify.
+I think this points to an inherent issue in the observability landscape: data is highly fragmented and causations are hard to surface.
 
 ## Technical Implementation
 
@@ -57,11 +57,9 @@ allowing the system to recognize them as instances of the same template.
 
 #### Aho-Corasick for High-Throughput Pattern Matching
 
-When building systems that need to match millions of incoming logs per second against thousands of known templates, the choice of pattern matching algorithm becomes critical. Traditional approaches like individual regex matching or trie traversals become bottlenecks at scale. The Aho-Corasick algorithm offers an elegant solution: it can simultaneously search for thousands of patterns in a single pass through the text.
+When building systems that need to match millions of incoming logs per second against thousands of known templates, the choice of pattern matching algorithm becomes critical. Traditional approaches like individual regex matching or trie traversals become bottlenecks at scale. While [LILAC](https://arxiv.org/pdf/2310.01796) focuses on accuracy improvements using LLMs with adaptive caching, and ByteDance's [ByteBrain-LogParser](https://arxiv.org/pdf/2504.09113) achieves 229K logs/second with hierarchical clustering optimizations, these approaches still fall short for truly high-scale systems. Even with ByteBrain's claimed 840% speedup over baselines, we need a fundamentally different approach to handle tens of millions of logs per second.
 
-##### The Core Problem
-
-Imagine a log analysis system that needs to classify millions of incoming logs per second against thousands of known templates. Most operations are pattern matching (reads), but occasionally you discover a new template and need to add it to the matcher. A naive approach would test each template individually, resulting in O(k×n) complexity where k is the number of templates and n is the log length. 
+The Aho-Corasick algorithm offers an elegant solution: it can simultaneously search for thousands of patterns in a single pass through the text.
 
 ##### Aho-Corasick: Multi-Pattern String Matching
 
@@ -82,12 +80,12 @@ Single pass finds all matches: [(0, "User login"), (5, "login successful"), (11,
 
 For log templates, this means we can simultaneously check if an incoming log matches any of thousands of known patterns in one efficient scan.
 
-##### Two-Phase Matching: Prefix Detection + Regex Validation
+##### Two-Phase Matching: Fixed Parts Detection + Regex Validation
 
-My approach uses Aho-Corasick for fast prefix detection, followed by regex matching for complete template validation. This hybrid strategy leverages the strengths of both algorithms:
+My approach uses Aho-Corasick to simultaneously match multiple fixed parts throughout the entire template, followed by regex matching for complete validation. This hybrid strategy provides more precise filtering than prefix-only matching:
 
-1. **Phase 1 - Aho-Corasick Prefix Matching**: Build an automaton containing the first few words of each template. This quickly identifies candidate templates.
-2. **Phase 2 - Regex Validation**: For each candidate, apply the full regex pattern to confirm the complete match.
+1. **Phase 1 - Aho-Corasick Multi-Part Matching**: Extract all fixed text portions from each template (the parts between placeholders). Build an automaton containing these fixed parts. When all fixed parts of a template are found in a log, it becomes a candidate.
+2. **Phase 2 - Regex Validation**: For each candidate where all fixed parts matched, apply the full regex pattern to confirm the complete match and verify correct ordering.
 
 Consider these log templates:
 ```
@@ -96,9 +94,7 @@ Consider these log templates:
 "System <SERVICE> started successfully"
 ```
 
-The Aho-Corasick automaton contains prefixes: [`"User"`, `"System"`]. When processing `"User 12345 logged in from 192.168.1.1"`, it immediately identifies `"User"` as a potential match, then tests the regex `^User \d+ logged in from [\d.]+$` to confirm.
-
-This approach dramatically reduces the number of regex operations. Instead of testing every template against every log (expensive), we only test regexes for templates whose prefixes match (cheap filtering + targeted validation).
+For the first template, we extract fixed parts: [`"User"`, `"logged in from"`]. The Aho-Corasick automaton contains all these fragments. When processing `"User 12345 logged in from 192.168.1.1"`, it finds both `"User"` and `"logged in from"`, marking this template as a candidate. We then test the regex `^User \w+ logged in from \d+\.\d+\.\d+\.\d+$` to confirm.
 
 ##### Implementation Pattern
 
@@ -107,11 +103,15 @@ The implementation centers around building and maintaining an Aho-Corasick autom
 ```rust
 use aho_corasick::{AhoCorasick, AhoCorasickBuilder};
 use regex::Regex;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 struct TemplateMatcher {
-    // Fast prefix matching
+    // Fast multi-part matching
     automaton: AhoCorasick,
+    // Maps each fixed part to the templates it belongs to
+    part_to_templates: HashMap<usize, Vec<usize>>,
+    // Maps template ID to its required fixed parts
+    template_parts: HashMap<usize, Vec<usize>>,
     // Template ID to regex mapping for validation
     template_patterns: HashMap<usize, Regex>,
     // Template ID to template string mapping
@@ -120,16 +120,30 @@ struct TemplateMatcher {
 
 impl TemplateMatcher {
     fn new(templates: &[(usize, String)]) -> Result<Self, Box<dyn std::error::Error>> {
-        let mut prefixes = Vec::new();
+        let mut all_parts = Vec::new();
+        let mut part_to_templates = HashMap::new();
+        let mut template_parts = HashMap::new();
         let mut template_patterns = HashMap::new();
         let mut template_map = HashMap::new();
+        let mut part_index = 0;
         
         for (template_id, template) in templates {
-            // Extract first 2-3 words as prefix for Aho-Corasick
-            let prefix = extract_prefix(template);
-            prefixes.push(prefix);
+            // Extract all fixed parts from the template
+            let fixed_parts = extract_fixed_parts(template);
+            let mut template_part_indices = Vec::new();
             
-            // Convert template to regex (replace <PLACEHOLDER> with \S+, etc.)
+            for part in fixed_parts {
+                all_parts.push(part);
+                part_to_templates.entry(part_index)
+                    .or_insert_with(Vec::new)
+                    .push(*template_id);
+                template_part_indices.push(part_index);
+                part_index += 1;
+            }
+            
+            template_parts.insert(*template_id, template_part_indices);
+            
+            // Convert template to regex
             let pattern = template_to_regex(template)?;
             template_patterns.insert(*template_id, Regex::new(&pattern)?);
             template_map.insert(*template_id, template.clone());
@@ -137,24 +151,34 @@ impl TemplateMatcher {
         
         let automaton = AhoCorasickBuilder::new()
             .ascii_case_insensitive(false)
-            .build(&prefixes)?;
+            .build(&all_parts)?;
             
         Ok(Self {
             automaton,
+            part_to_templates,
+            template_parts,
             template_patterns,
             templates: template_map,
         })
     }
     
     fn match_log(&self, log: &str) -> Option<usize> {
-        // Phase 1: Fast prefix matching with Aho-Corasick
-        let prefix_matches: Vec<_> = self.automaton
-            .find_iter(log)
-            .map(|mat| mat.pattern().as_usize())
-            .collect();
-            
+        // Phase 1: Find all fixed parts present in the log
+        let mut found_parts = HashSet::new();
+        for mat in self.automaton.find_iter(log) {
+            found_parts.insert(mat.pattern().as_usize());
+        }
+        
+        // Find templates where all required parts were found
+        let mut candidates = HashSet::new();
+        for (template_id, required_parts) in &self.template_parts {
+            if required_parts.iter().all(|part| found_parts.contains(part)) {
+                candidates.insert(*template_id);
+            }
+        }
+        
         // Phase 2: Validate candidates with regex
-        for template_id in prefix_matches {
+        for template_id in candidates {
             if let Some(regex) = self.template_patterns.get(&template_id) {
                 if regex.is_match(log) {
                     return Some(template_id);
@@ -166,11 +190,19 @@ impl TemplateMatcher {
     }
 }
 
-fn extract_prefix(template: &str) -> String {
-    template.split_whitespace()
-        .take(2)  // First 2 words
-        .collect::<Vec<_>>()
-        .join(" ")
+fn extract_fixed_parts(template: &str) -> Vec<String> {
+    // Split template by placeholders and extract non-empty fixed parts
+    use regex::Regex;
+    let placeholder_regex = Regex::new(r"<[^>]+>").unwrap();
+    let parts: Vec<String> = placeholder_regex
+        .split(template)
+        .filter(|s| !s.trim().is_empty())
+        .map(|s| s.trim().to_string())
+        .collect();
+    
+    // If template starts with fixed text, include it
+    // If template has fixed text between or after placeholders, include those too
+    parts
 }
 
 fn template_to_regex(template: &str) -> Result<String, Box<dyn std::error::Error>> {
@@ -232,11 +264,11 @@ Unlike persistent data structures, we rebuild the entire Aho-Corasick automaton 
 
 For the Aho-Corasick approach with T templates and average log length N:
 
-- **Match**: O(N + M) where M is the number of prefix matches (typically M << T)
-- **Build**: O(total pattern length) for automaton construction
-- **Space**: O(total pattern length) for the automaton plus O(T) for regex storage
+- **Match**: O(N + P×C) where P is the number of fixed parts found and C is the number of candidate templates (typically C << T)
+- **Build**: O(total fixed parts length) for automaton construction
+- **Space**: O(total fixed parts length) for the automaton plus O(T) for regex storage
 
-The key performance win comes from the filtering effect: instead of testing T regexes against each log, we only test the small subset that match the prefix. For a system with 10,000 templates where typical logs match 1-2 prefixes, we achieve a 5000x reduction in regex operations.
+The key performance win comes from the enhanced filtering effect: instead of testing T regexes against each log, we only test templates where ALL their fixed parts were found in the log. This is more selective than prefix-only matching. For a system with 10,000 templates where typical logs contain parts from 20-30 templates but only 1-2 templates have ALL their parts present, we achieve even greater reduction in regex operations compared to prefix-only matching.
 
 **Real-world benchmarks** (1M logs, batch processing with 10 threads):
 ```
@@ -247,7 +279,11 @@ Batch parallel (size=1000, 10 threads):
   Speedup vs baseline: 4.90x
 ```
 
-This demonstrates the approach can handle **51+ million logs per second** with a 42.8% match rate, achieving nearly 5x speedup over traditional regex-only matching. Note that this benchmark measures pure pattern matching performance against known templates - it doesn't include LLM processing time for discovering new templates from unmatched logs. In practice, LLM processing time for unmatched logs will be the bottleneck, not the pattern matching itself. The high throughput makes real-time log analysis feasible for systems with mature template sets where most logs match existing patterns.
+This demonstrates the approach can handle **51+ million logs per second** with a 88% match rate, achieving nearly 5x speedup over traditional regex-only matching. Note that this benchmark measures pure pattern matching performance against known templates - it doesn't include LLM processing time for discovering new templates from unmatched logs. In practice, LLM processing time for unmatched logs will be the bottleneck, not the pattern matching itself. The high throughput makes real-time log analysis feasible for systems with mature template sets where most logs match existing patterns. What this does suggest though is that with offline processing of internal log datasets, this parser can probably handle several services' worth of logs on a single node. 
+
+##### Ablation Study: Breaking Down the Performance Gains
+
+TODO: I need to do a comparison study
 
 ##### When to Use This Pattern
 
