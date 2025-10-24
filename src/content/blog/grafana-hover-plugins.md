@@ -195,14 +195,24 @@ The plugin eliminates the cognitive overhead of correlating metrics with logs ma
 
 ## Try It Yourself
 
-The plugin is open source at [https://github.com/StandardRunbook/grafana-hover-plugin](https://github.com/StandardRunbook/grafana-hover-plugin)
+Both components are open source:
 
-Currently pending Grafana's approval process. Install from source:
+- **Grafana Plugin**: [https://github.com/StandardRunbook/grafana-hover-plugin](https://github.com/StandardRunbook/grafana-hover-plugin)
+- **Log Analysis Backend**: [https://github.com/StandardRunbook/log_analysis](https://github.com/StandardRunbook/log_analysis)
+
+The plugin is currently pending Grafana's approval process. Install from source:
 
 ```bash
+# Install the plugin
 git clone https://github.com/StandardRunbook/grafana-hover-plugin
+cd grafana-hover-plugin
 pnpm run build
 pnpm run server
+
+# Install the log analysis backend
+git clone https://github.com/StandardRunbook/log_analysis
+cd log_analysis
+# Follow setup instructions in README
 ```
 
 Your 3 AM debugging sessions will never be the same.
