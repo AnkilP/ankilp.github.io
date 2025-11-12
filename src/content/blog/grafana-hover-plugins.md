@@ -142,6 +142,18 @@ Testing across 16 different log datasets shows consistently high throughput and 
 
 The system achieves over 2.2 million logs per second on simpler datasets (HealthApp) and maintains high throughput even on complex datasets with many templates. Latency stays under 13 microseconds across all tested log formats.
 
+### Why Template Complexity Affects Performance
+
+The performance varies significantly across datasets due to template characteristics:
+
+**Template Count Impact**: Linux logs have 119 templates vs Apache's 9 templates. More templates mean the Aho-Corasick automaton has more states and transitions to evaluate, increasing the matching complexity.
+
+**Fragment Size**: Linux logs contain much larger variable fragments on average. While Apache logs might have short variables like IP addresses or status codes, Linux system logs often include long file paths, process names, and detailed error messages. Larger fragments require more character comparisons during the matching phase.
+
+**Pattern Diversity**: System logs from Linux cover everything from kernel messages to application errors, creating highly diverse patterns. Apache logs follow a more uniform structure (request method, path, status, size), allowing for more efficient pattern matching.
+
+This explains why Linux achieves 384K logs/sec while Apache processes 1.2M logs/sec despite both having 4,000 test logs. The throughput difference directly correlates with template complexity rather than log volume.
+
 ### Comparison with Other Log Parsers
 
 Here's how this implementation compares to existing solutions:
