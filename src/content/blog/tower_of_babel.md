@@ -92,4 +92,4 @@ Every generation has inherited its predecessors' tradeoffs. AI won’t erase our
 
 We can probably build a more fluid, emergent system. The real question is whether we have the vision and will to do so.
 
-*A thread I pulled out of an earlier draft of this essay and gave its own post: [rewriting the law itself as a provable language](/posts/provable-language-in-law).*
+*Two threads I pulled out of an earlier draft of this essay and gave their own posts: [rewriting the law itself as a provable language](/posts/provable-language-in-law), and [the mismatch between our demand for information and the institutions that try to supply it](/posts/information-supply-demand).*
