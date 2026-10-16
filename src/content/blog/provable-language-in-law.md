@@ -20,7 +20,52 @@ If we can't hire our way out, we have to redesign the system, and the place to s
 
 Traffic law is where the compression is easiest to see, but it's also the least damaging case. If a red-light rule is too coarse — obey it unconditionally, even at 3am on an empty road — the cost is a few wasted minutes. Real damage lives in statutes that govern billions of dollars or a person's freedom: a tax code that has to fit in a book people can actually read, a criminal statute that has to leave room for a jury's judgment, a contract clause that gets litigated because the drafter and the reader parsed the same English words differently. The law's *intent* is usually clear in each of these. The trouble is that natural language forces the intent through a compression stage: the drafter has to imagine every case the statute will hit, pick words that cover the important ones, and hope the courts fill in the gaps. Every step of that pipeline leaks information.
 
-Formal languages for law already exist, mostly in research labs. [Catala](https://arxiv.org/abs/2103.03198), developed at Inria, lets lawyers and programmers write a statute side by side with its executable version, paragraph by paragraph. Its authors used it to encode Section 121 of the US tax code and France's family benefits rules, and in the process found a bug in the French government's official implementation. "Provable" is the important word. Once a statute is written formally, you can start checking properties of the law itself before anyone is subject to it: that no two provisions contradict each other, that every combination of facts produces an outcome, and that a given decision actually follows from the facts on record. In natural language, we find those gaps one lawsuit at a time.
+Formal languages for law already exist, mostly in research labs. [Catala](https://arxiv.org/abs/2103.03198), developed at Inria, lets lawyers and programmers write a statute side by side with its executable version, paragraph by paragraph. Its authors used it to encode Section 121 of the US tax code and France's family benefits rules, and in the process found a bug in the French government's official implementation.
+
+Here's what that looks like. Section 121 lets you exclude up to $250,000 of gain from the sale of your home from taxable income. For married couples filing jointly, the statute raises that cap:
+
+> Paragraph (1) shall be applied by substituting “$500,000” for “$250,000” if—
+>
+> (i) either spouse meets the ownership requirements of subsection (a) with respect to such property;
+>
+> (ii) both spouses meet the use requirements of subsection (a) with respect to such property; and
+>
+> (iii) neither spouse is ineligible for the benefits of subsection (a) with respect to such property by reason of paragraph (3).
+
+And here is the same paragraph in Catala, lightly abridged from the project's [US tax code examples](https://github.com/CatalaLang/catala-examples/blob/2694b17ddd7c2246e207e8f077d586349ee5abea/us_tax_code/section_121.catala_en#L269-L313):
+
+```
+scope Section121TwoPersons:
+  rule section_121_b_2_A_condition
+  under condition
+    (return_type with pattern JointReturn)
+    and
+      # i)
+    (
+      section121Person1.requirements_ownership_met
+      or section121Person2.requirements_ownership_met
+    )
+    and
+      # ii)
+    (
+      section121Person1.requirements_usage_met
+      and section121Person2.requirements_usage_met
+    )
+    # iii)
+    and (not (section121Person1.section_121_b_3_applies))
+    and (not (section121Person2.section_121_b_3_applies))
+  consequence fulfilled
+
+  exception
+  definition gain_cap
+  under condition section_121_b_2_A_condition
+  consequence equals
+    $500,000
+```
+
+Each numbered clause becomes one condition, and the comments point back to the clause it implements, so a lawyer can audit the code against the statute line by line. The `exception` keyword is the clever part. Statutes are written as a default followed by exceptions: the cap is $250,000, *unless* these conditions hold. Catala keeps that structure intact instead of flattening it into nested if-statements, which is where hand-written implementations of the law tend to drift from the text.
+
+"Provable" is the important word. Once a statute is written formally, you can start checking properties of the law itself before anyone is subject to it: that no two provisions contradict each other, that every combination of facts produces an outcome, and that a given decision actually follows from the facts on record. In natural language, we find those gaps one lawsuit at a time.
 
 AI fits on both sides of that formal core. On the way in, models can help translate existing statute books into formal code, which is the slow, expensive step that has kept tools like Catala in research labs. On the way out, they can turn messy evidence (bank statements, postal records, sensor logs) into the structured facts a formal rule needs. The rule itself stays explicit and checkable. That split matters. You don't want a model deciding what the law means, but you can let one do the clerical work of getting facts into a form the law can be applied to.
 
